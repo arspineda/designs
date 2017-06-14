@@ -1,3 +1,5 @@
+# designs
+
 This is a repository for some of my recent Processing experiments!
 
 Diagonal: Connects dots on a grid with only diagonal lines, where each new line
