@@ -6,35 +6,32 @@
   diagonal lines.
 */
 
-PGraphics baseImage;
+Grid base;
 int NUM_ROWS = 8;
 int NUM_COLS = 8;
-boolean[][] vertices = new boolean[NUM_ROWS][NUM_COLS];
-int spacingCol;
-int spacingRow; 
-int prevRow;
-int prevCol;
 boolean resetMode = false;
 
 void setup(){
   size(400,400);
-  spacingCol = int(map(1,0,NUM_COLS+1,0,width));
-  spacingRow = int(map(1,0,NUM_ROWS+1,0,height));
-  baseImage = createGraphics(width,height);
-  drawGrid();
-  resetGrid();
-  image(baseImage,0,0);
+  base = new Grid(width,height,NUM_ROWS,NUM_COLS); 
+  base.drawGrid();
+  base.resetGrid();
+  image(base.getBaseIm(),0,0);
   noLoop();
 }
   
 void draw(){
+  int prevRow = int(random(0,base.rows));
+  int prevCol = int(random(0,base.cols));
+  base.vertices[prevRow][prevCol] = true;
+  
   int currRow;
   int currCol;
   int tries = 30;
   
   if(resetMode == true){
-    resetGrid();
-    image(baseImage,0,0);
+    base.resetGrid();
+    image(base.getBaseIm(),0,0);
     resetMode = false;
   }
   
@@ -51,13 +48,13 @@ void draw(){
   //and just pick randomly from the ones left. but representing the latter is weird
   
   while(tries > 0){
-    currRow = (prevRow + (int) random(1,NUM_ROWS)) % NUM_ROWS;
-    currCol = (prevCol + (int) random(1,NUM_COLS)) % NUM_COLS;
+    currRow = (prevRow + (int) random(1,base.rows)) % base.rows;
+    currCol = (prevCol + (int) random(1,base.cols)) % base.cols;
     
-    if(vertices[currRow][currCol] == false){
-      line((prevCol+1)*spacingCol,(prevRow+1)*spacingRow,
-       (currCol+1)*spacingCol,(currRow+1)*spacingRow);
-      vertices[currRow][currCol] = true;
+    if(base.vertices[currRow][currCol] == false){
+      line((prevCol+1)*base.spacingCol,(prevRow+1)*base.spacingRow,
+       (currCol+1)*base.spacingCol,(currRow+1)*base.spacingRow);
+      base.vertices[currRow][currCol] = true;
       prevRow = currRow;
       prevCol = currCol;
       tries = 30;
@@ -66,6 +63,7 @@ void draw(){
       tries--;
     }
   }
+  
 }
 
 void mousePressed(){
@@ -78,31 +76,3 @@ void mousePressed(){
 //I think was a rounding error.
 
 //false means the vertex has not been visited; true otherwise //<>//
-
-//First, initialize matrix and draw points
-
-void resetGrid(){
-  for(int i = 0; i < NUM_ROWS; i++){
-    for(int j = 0; j < NUM_COLS; j++){
-      vertices[i][j] = false;
-    }
-  } 
-  
-  prevRow = int(random(0,NUM_ROWS));
-  prevCol = int(random(0,NUM_COLS));
-  vertices[prevRow][prevCol] = true;
-}
-
-void drawGrid(){
-  baseImage.beginDraw();
-  baseImage.background(200,150,200);
-  baseImage.stroke(0);
-  baseImage.strokeWeight(3);
-  for(int i = 0; i < NUM_ROWS; i++){
-    for(int j = 0; j < NUM_COLS; j++){
-      baseImage.point((j+1)*spacingCol,(i+1)*spacingRow);
-    }
-  }
-  baseImage.endDraw();
-}
-//Next, we start at a point and visit vertices
